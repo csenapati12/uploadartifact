@@ -1,0 +1,42 @@
+# This workflow demonstrates how to download an artifact from a previous workflow run.
+# It's designed to complement the 'Upload Build Artifact' workflow.
+
+# Name of the workflow.
+name: Download Build Artifact
+
+# This workflow can be triggered manually from the Actions tab.
+on:
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs.
+jobs:
+  # This workflow contains a single job called "download-and-verify"
+  download-and-verify:
+    # The type of runner that the job will run on.
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      # Step 1: Use the official 'download-artifact' action.
+      # This action downloads artifacts from your workflow runs.
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          # The name of the artifact to download.
+          # This must match the 'name' provided in the 'upload-artifact' step of the previous workflow.
+          name: my-artifact
+          # Optional: The path where the artifact should be downloaded.
+          # If not specified, it will be downloaded to the root of the workspace.
+          # path: downloaded-artifact/
+
+      # Step 2: Verify the artifact was downloaded correctly.
+      # This step lists the files in the current directory.
+      # You should see the 'sample-file.txt' that was in the uploaded artifact.
+      - name: List files after download
+        run: ls -R
+
+      # Step 3: You can now use the downloaded files.
+      # For example, reading the content of the sample file.
+      - name: Use the downloaded file
+        run: cat sample-file.txt
+
