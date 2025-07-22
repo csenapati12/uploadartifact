@@ -1,4 +1,4 @@
-# This workflow demonstrates how to download an artifact from a specific workflow run.
+# This workflow demonstrates how to download an artifact from a specific, separate workflow run.
 # It's designed to complement the 'Upload Build Artifact' workflow.
 
 # Name of the workflow.
@@ -17,31 +17,45 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job.
     steps:
-      # Step 1: Use the official 'download-artifact' action.
-      # This action downloads artifacts from your workflow runs.
-      - name: Download artifact from a specific workflow
+      # Step 1: Find the ID of the latest successful workflow run from the 'Upload Build Artifact' workflow.
+      # We use the GitHub CLI (gh) for this, which requires the GITHUB_TOKEN.
+      - name: Get latest successful workflow run ID
+        id: get_run_id
+        env:
+          # The GITHUB_TOKEN is automatically provided by GitHub Actions.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Use 'gh run list' to find the latest successful run on the main branch for the specified workflow.
+          # We extract just the run ID using the --json and -q flags.
+          run_id=$(gh run list --workflow "Upload Build Artifact" --branch main --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          if [ -z "$run_id" ]; then
+            echo "::error::No successful workflow run found for 'Upload Build Artifact' on branch 'main'."
+            exit 1
+          fi
+          # Set the found run_id as an output of this step to use it in the next step.
+          echo "run_id=${run_id}" >> $GITHUB_OUTPUT
+
+      # Step 2: Use the official 'download-artifact' action with the specific run_id.
+      - name: Download artifact from a specific workflow run
         uses: actions/download-artifact@v4
         with:
           # The name of the artifact to download.
-          # This must match the 'name' provided in the 'upload-artifact' step.
           name: my-artifact
-          # Specify the workflow that created the artifact.
-          # You can use the workflow name, ID, or file name.
-          workflow: 'Upload Build Artifact'
-          # Specify the branch the workflow ran on.
-          # This will download the artifact from the latest run on the 'main' branch.
-          branch: main
-          # Optional: Specify the conclusion of the workflow run.
-          # This ensures we only get artifacts from successful runs.
-          workflow_conclusion: success
+          # The repository owner and name.
+          repository: ${{ github.repository }}
+          # The ID of the workflow run where the artifact was created.
+          # We get this from the output of the previous step.
+          run-id: ${{ steps.get_run_id.outputs.run_id }}
+          # The GITHUB_TOKEN is required to download artifacts from a different workflow run.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 2: Verify the artifact was downloaded correctly.
+      # Step 3: Verify the artifact was downloaded correctly.
       # This step lists the files in the current directory.
       # You should see the 'sample-file.txt' that was in the uploaded artifact.
       - name: List files after download
         run: ls -R
 
-      # Step 3: You can now use the downloaded files.
+      # Step 4: You can now use the downloaded files.
       # For example, reading the content of the sample file.
       - name: Use the downloaded file
         run: cat sample-file.txt
