@@ -1,4 +1,4 @@
-# This workflow demonstrates how to download an artifact from a previous workflow run.
+# This workflow demonstrates how to download an artifact from a specific workflow run.
 # It's designed to complement the 'Upload Build Artifact' workflow.
 
 # Name of the workflow.
@@ -19,15 +19,21 @@ jobs:
     steps:
       # Step 1: Use the official 'download-artifact' action.
       # This action downloads artifacts from your workflow runs.
-      - name: Download artifact
+      - name: Download artifact from a specific workflow
         uses: actions/download-artifact@v4
         with:
           # The name of the artifact to download.
-          # This must match the 'name' provided in the 'upload-artifact' step of the previous workflow.
+          # This must match the 'name' provided in the 'upload-artifact' step.
           name: my-artifact
-          # Optional: The path where the artifact should be downloaded.
-          # If not specified, it will be downloaded to the root of the workspace.
-          # path: downloaded-artifact/
+          # Specify the workflow that created the artifact.
+          # You can use the workflow name, ID, or file name.
+          workflow: 'Upload Build Artifact'
+          # Specify the branch the workflow ran on.
+          # This will download the artifact from the latest run on the 'main' branch.
+          branch: main
+          # Optional: Specify the conclusion of the workflow run.
+          # This ensures we only get artifacts from successful runs.
+          workflow_conclusion: success
 
       # Step 2: Verify the artifact was downloaded correctly.
       # This step lists the files in the current directory.
@@ -39,4 +45,3 @@ jobs:
       # For example, reading the content of the sample file.
       - name: Use the downloaded file
         run: cat sample-file.txt
-
