@@ -1,45 +1,18 @@
-# This is a basic GitHub Actions workflow file.
-# It demonstrates how to create a file and upload it as a build artifact.
-
-# Name of the workflow, which will be displayed in the Actions tab of your GitHub repository.
 name: Upload Build Artifact
-
-# Controls when the workflow will run.
-# This example triggers the workflow on push events to the main branch.
 on:
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel.
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on.
-    # 'ubuntu-latest' is a good general-purpose choice.
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job.
     steps:
-      # Step 1: Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # Step 2: Create a directory to store the artifact
       - name: Create artifact directory
         run: mkdir -p my_artifact_folder
-
-      # Step 3: Create a sample file to be uploaded as an artifact.
-      # In a real-world scenario, this step would be your build process
-      # which generates files (e.g., binaries, compiled code, test reports).
       - name: Create a sample file
         run: echo "Hello, world! This is a sample artifact." > my_artifact_folder/sample-file.txt
-
-      # Step 4: Use the official 'upload-artifact' action to archive and upload the artifact.
-      # This action takes the files you specify and uploads them to the workflow run.
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          # The name of the artifact to be uploaded. This will be visible in the GitHub UI.
           name: my-artifact
-          # The path to the file or directory to upload.
-          # You can use wildcards. In this case, it's the directory we created.
           path: my_artifact_folder/
