@@ -10,7 +10,7 @@ jobs:
       - name: Create artifact directory
         run: mkdir -p my_artifact_folder
       - name: Create a sample file
-        run: echo "Hello, world! This is a sample artifact." > my_artifact_folder/sample-file.txt
+        run: echo "Hello, world! This is a sample artifact. my name is chaitanya" > my_artifact_folder/sample-file.txt
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
