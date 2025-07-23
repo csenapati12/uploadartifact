@@ -5,9 +5,10 @@ jobs:
   download_and_read:
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
+      - name: Download artifact from previous run
+        uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: Upload Build Artifact # or the filename of your upload workflow, e.g., upload-artifact.yml
           name: my-artifact
           path: downloaded_artifact/
       - name: Read file contents
