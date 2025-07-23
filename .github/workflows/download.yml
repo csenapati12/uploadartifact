@@ -7,8 +7,8 @@ jobs:
     steps:
       - name: Download artifact from previous run
         uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: Upload Build Artifact # or the filename of your upload workflow, e.g., upload-artifact.yml
+        with:          
+          workflow: upload-artifact.yml
           name: my-artifact
           path: downloaded_artifact/
       - name: Read file contents
