@@ -5,33 +5,45 @@ on:
     branches:
       - main
 
-  workflow_dispatch:  # 👈 Allows manual triggering from the GitHub Actions UI
+  workflow_dispatch:
     inputs:
       deployment_reason:
         description: 'Reason for deployment'
         required: false
-        default: 'Manual trigger from workflow_dispatch'
+        default: 'Manual trigger'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    environment: prod  # 👈 Links to the Environment settings in your repo
+    environment: production
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Load environment variables from file
+        run: |
+          echo "Loading env variables from prod.env"
+          set -a
+          source prod.env
+          set +a
+          # Export to GITHUB_ENV so other steps can use them
+          while IFS= read -r line || [ -n "$line" ]; do
+            if [[ ! "$line" =~ ^# && "$line" == *"="* ]]; then
+              echo "$line" >> "$GITHUB_ENV"
+            fi
+          done < prod.env
+
       - name: Print deployment info (safe)
         run: |
           echo "Deployment Reason: ${{ github.event.inputs.deployment_reason }}"
-          echo "Region: $REGION"
-          echo "Endpoint: $ENDPOINT"
-        env:
-          REGION: ${{ vars.PROD_REGION }}
-          ENDPOINT: ${{ vars.PROD_ENDPOINT }}
+          echo "Region: $PROD_REGION"
+          echo "Endpoint: $PROD_ENDPOINT"
+          echo "test $PROD_API_KEY2"
 
-      - name: Use API key (do not echo it!)
+      - name: Use API key securely
         run: |
-          echo "Calling deployment endpoint...$ENDPOINT"
-         
+          echo "Triggering deployment call..."
+          curl -H "Authorization: Bearer $PROD_API_KEY" "$PROD_ENDPOINT/deploy"
+        env:
+          PROD_API_KEY: ${{ secrets.PROD_API_KEY }}  # Use secrets here
