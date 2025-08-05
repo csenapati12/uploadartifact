@@ -1,0 +1,24 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod  # 👈 IMPORTANT: must match environment in settings
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Access PROD variable
+        run: echo "API Key is $PROD_API_KEY"
+        env:
+          PROD_API_KEY: ${{ vars.PROD_API_KEY }}   # 👈 Reference environment variable
+      - name: Access PROD variable1
+        run: echo "API Key is $PROD_API_KEY2"
+        env:
+          PROD_API_KEY: ${{ vars.PROD_API_KEY2 }}
