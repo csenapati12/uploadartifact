@@ -1,0 +1,107 @@
+name: Deployment Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  qadev:
+    name: Deploy to QADEV
+    runs-on: ubuntu-latest
+    environment: QADEV
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to QADEV..."
+          # Add your deployment commands here
+
+  qadev2:
+    name: Deploy to QADEV2
+    runs-on: ubuntu-latest
+    environment: QADEV2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to QADEV2..."
+          # Add your deployment commands here
+
+  situat:
+    name: Deploy to SITUAT
+    runs-on: ubuntu-latest
+    environment: SITUAT
+    needs: qadev
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to SITUAT..."
+          # Add your deployment commands here
+
+  sit2:
+    name: Deploy to SIT2
+    runs-on: ubuntu-latest
+    environment: SIT2
+    needs: qadev2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to SIT2..."
+          # Add your deployment commands here
+
+  preprod:
+    name: Deploy to Preprod
+    runs-on: ubuntu-latest
+    environment: Preprod
+    needs: [situat, sit2]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to Preprod..."
+          # Add your deployment commands here
+
+  prod:
+    name: Deploy to Prod
+    runs-on: ubuntu-latest
+    environment: Prod
+    needs: preprod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to Prod..."
+          # Add your deployment commands here
+
+  partner:
+    name: Deploy to Partner
+    runs-on: ubuntu-latest
+    environment: Partner
+    needs: preprod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to Partner..."
+          # Add your deployment commands here
+
+  training:
+    name: Deploy to Training
+    runs-on: ubuntu-latest
+    environment: Training
+    needs: preprod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          echo "Deploying to Training..."
+          # Add your deployment commands here
