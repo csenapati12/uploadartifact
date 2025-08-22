@@ -1,0 +1,138 @@
+name: Build&Deploy_parameter
+
+on:
+  # This trigger runs all jobs automatically on a push to main
+  push:
+    branches:
+      - main
+  # This trigger allows you to manually run the workflow with options
+  workflow_dispatch:
+    inputs:
+      pipeline:
+        type: choice
+        description: 'Which pipeline to run?'
+        required: true
+        default: 'all'
+        options:
+        - all
+        - qadev
+        - qadev2
+        - release
+
+jobs:
+  # =======================================================
+  # Initial Build Jobs - These three will run in parallel
+  # =======================================================
+  build_qadev:
+    name: Build QADEV
+    # This job will only run if triggered by a push, or if 'all' or 'qadev' is selected manually
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build for QADEV
+        run: echo "Building for QADEV..."
+
+  build_qadev2:
+    name: Build QADEV2
+    # This job will only run if triggered by a push, or if 'all' or 'qadev2' is selected manually
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev2'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build for QADEV2
+        run: echo "Building for QADEV2..."
+
+  build_release:
+    name: Build Release
+    # This job will only run if triggered by a push, or if 'all' or 'release' is selected manually
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build Release Candidate
+        run: echo "Building Release..."
+
+  # =======================================================
+  # Pipeline Track 1: QADEV
+  # =======================================================
+  deploy_qadev:
+    name: Deploy QADEV
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev'
+    runs-on: ubuntu-latest
+    needs: build_qadev
+    steps:
+      - name: Deploy to QADEV
+        run: echo "Deploying to QADEV..."
+
+  # =======================================================
+  # Pipeline Track 2: QADEV2 -> SIT2 -> Training -> Partner
+  # =======================================================
+  deploy_qadev2:
+    name: Deploy QADEV2
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev2'
+    runs-on: ubuntu-latest
+    needs: build_qadev2
+    steps:
+      - name: Deploy to QADEV2
+        run: echo "Deploying to QADEV2..."
+
+  deploy_sit2:
+    name: Deploy SIT2
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev2'
+    runs-on: ubuntu-latest
+    needs: deploy_qadev2
+    steps:
+      - name: Deploy to SIT2
+        run: echo "Deploying to SIT2..."
+
+  deploy_training:
+    name: Deploy Training
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev2'
+    runs-on: ubuntu-latest
+    needs: deploy_sit2
+    steps:
+      - name: Deploy to Training
+        run: echo "Deploying to Training..."
+
+  deploy_partner:
+    name: Deploy Partner
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'qadev2'
+    runs-on: ubuntu-latest
+    needs: deploy_training
+    steps:
+      - name: Deploy to Partner
+        run: echo "Deploying to Partner..."
+
+  # =======================================================
+  # Pipeline Track 3: SITUAT -> PREPROD -> PROD
+  # =======================================================
+  deploy_situat:
+    name: Deploy SITUAT
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'release'
+    runs-on: ubuntu-latest
+    needs: build_release
+    steps:
+      - name: Deploy to SITUAT
+        run: echo "Deploying to SITUAT..."
+
+  deploy_preprod:
+    name: Deploy PREPROD
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'release'
+    runs-on: ubuntu-latest
+    needs: deploy_situat
+    steps:
+      - name: Deploy to PREPROD
+        run: echo "Deploying to PREPROD..."
+
+  deploy_prod:
+    name: Deploy PROD
+    if: github.event_name == 'push' || github.event.inputs.pipeline == 'all' || github.event.inputs.pipeline == 'release'
+    runs-on: ubuntu-latest
+    needs: deploy_preprod
+    steps:
+      - name: Deploy to PROD
+        run: echo "Deploying to PROD..."
