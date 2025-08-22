@@ -1,9 +1,6 @@
 name: Deployment Workflow with Approvals
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
