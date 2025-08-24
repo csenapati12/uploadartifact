@@ -1,0 +1,102 @@
+name: Deployment Workflow with Approvals-latest
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_release:
+    name: Build Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build Release Artifact
+        run: |
+          echo "Building the release artifact..."
+          # Add your build commands here
+          # Consider using actions/upload-artifact to save the build output
+
+  deploy_qadev:
+    name: Deploy QADEV
+    runs-on: ubuntu-latest
+    needs: build_release
+    steps:
+      - name: Deploy to QADEV
+        run: echo "Deploying to QADEV..."
+        # Add your deployment commands here
+
+  deploy_qadev2:
+    name: Deploy QADEV2
+    runs-on: ubuntu-latest
+    needs: build_release
+    steps:
+      - name: Deploy to QADEV2
+        run: echo "Deploying to QADEV2..."
+        # Add your deployment commands here
+
+  # ===============================================
+  # Jobs Below Require Manual Approval
+  # ===============================================
+
+  deploy_sit2:
+    name: Deploy SIT2
+    runs-on: ubuntu-latest
+    needs: build_release
+    environment: SIT2
+    steps:
+      - name: Deploy to SIT2
+        run: echo "Deploying to SIT2..."
+        # Add your deployment commands here
+
+  deploy_partner:
+    name: Deploy Partner
+    runs-on: ubuntu-latest
+    needs: build_release
+    environment: Partner
+    steps:
+      - name: Deploy to Partner
+        run: echo "Deploying to Partner..."
+        # Add your deployment commands here
+
+  deploy_training:
+    name: Deploy Training
+    runs-on: ubuntu-latest
+    needs: build_release
+    environment: Training
+    steps:
+      - name: Deploy to Training
+        run: echo "Deploying to Training..."
+        # Add your deployment commands here
+
+  deploy_situat:
+    name: Deploy SITUAT
+    runs-on: ubuntu-latest
+    needs: deploy_qadev2
+    environment: SITUAT
+    steps:
+      - name: Deploy to SITUAT
+        run: echo "Deploying to SITUAT..."
+        # Add your deployment commands here
+
+  deploy_preprod:
+    name: Deploy Preprod
+    runs-on: ubuntu-latest
+    needs: deploy_situat
+    environment: Preprod
+    steps:
+      - name: Deploy to Preprod
+        run: echo "Deploying to Preprod..."
+        # Add your deployment commands here
+
+  deploy_prod:
+    name: Deploy Prod
+    runs-on: ubuntu-latest
+    needs: deploy_preprod
+    environment: Prod
+    steps:
+      - name: Deploy to Prod
+        run: echo "Deploying to Prod..."
+        # Add your deployment commands here
