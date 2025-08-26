@@ -1,0 +1,57 @@
+name: QADEV Deployment Workflow
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  build_qadev:
+    name: Build QADEV
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: |
+          echo "Setting up build environment..."
+          # Add your setup commands here (e.g., install dependencies)
+
+      - name: Run Build
+        run: |
+          echo "Building the application..."
+          # Add your build commands here
+          echo "Build complete."
+
+  deploy_qadev:
+    name: Deploy to QADEV
+    needs: build_qadev
+    runs-on: ubuntu-latest
+    environment: 
+      name: qadev
+      url: https://qadev.example.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to qadev environment
+        run: |
+          echo "Deploying to the QADEV environment..."
+          # Add your deployment script/commands here
+          echo "Deployment to QADEV successful."
+
+  deploy_qadev2:
+    name: Deploy to QADEV2
+    needs: build_qadev
+    runs-on: ubuntu-latest
+    environment:
+      name: qadev2
+      url: https://qadev2.example.com
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to qadev2 environment
+        run: |
+          echo "Deploying to the QADEV2 environment..."
+          # Add your deployment script/commands here
+          echo "Deployment to QADEV2 successful."
