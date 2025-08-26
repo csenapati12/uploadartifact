@@ -1,5 +1,4 @@
 name: QADEV Deployment Workflow
-
 on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
@@ -10,7 +9,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Environment
         run: |
           echo "Setting up build environment..."
@@ -27,8 +25,7 @@ jobs:
     needs: build_qadev
     runs-on: ubuntu-latest
     environment: 
-      name: qadev
-      url: https://qadev.example.com
+      name: qadev      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,8 +41,7 @@ jobs:
     needs: build_qadev
     runs-on: ubuntu-latest
     environment:
-      name: qadev2
-      url: https://qadev2.example.com
+      name: qadev2      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
