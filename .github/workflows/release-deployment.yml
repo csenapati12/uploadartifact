@@ -1,0 +1,83 @@
+name: Release Deployment Workflow
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  build_release:
+    name: Build Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: |
+          echo "Setting up build environment..."
+          # Add your setup commands here (e.g., install dependencies)
+
+      - name: Run Build
+        run: |
+          echo "Building the release artifact..."
+          # Add your build commands here
+          echo "Build complete."
+
+  deploy_situat:
+    name: Deploy to SIT-UAT
+    needs: build_release
+    runs-on: ubuntu-latest
+    environment: 
+      name: situat    
+    steps:
+      - name: Deploy to SIT-UAT
+        run: echo "Deploying to the SIT-UAT environment..."
+
+  deploy_sit2:
+    name: Deploy to SIT2
+    needs: build_release
+    runs-on: ubuntu-latest
+    environment:
+      name: sit2     
+    steps:
+      - name: Deploy to SIT2
+        run: echo "Deploying to the SIT2 environment..."
+
+  deploy_training:
+    name: Deploy to Training
+    needs: build_release
+    runs-on: ubuntu-latest
+    environment:
+      name: training     
+    steps:
+      - name: Deploy to Training
+        run: echo "Deploying to the Training environment..."
+
+  deploy_partner:
+    name: Deploy to Partner
+    needs: build_release
+    runs-on: ubuntu-latest
+    environment:
+      name: partner
+    steps:
+      - name: Deploy to Partner
+        run: echo "Deploying to the Partner environment..."
+
+  deploy_preprod:
+    name: Deploy to Pre-Prod
+    needs: [deploy_situat, deploy_sit2] # Depends on both SIT environments
+    runs-on: ubuntu-latest
+    environment:
+      name: preprod  
+    steps:
+      - name: Deploy to Pre-Prod
+        run: echo "Deploying to the Pre-Prod environment..."
+
+  deploy_prod:
+    name: Deploy to Production
+    needs: deploy_preprod
+    runs-on: ubuntu-latest
+    environment:
+      name: prod      
+    steps:
+      - name: Deploy to Production
+        run: echo "Deploying to the Production environment..."
