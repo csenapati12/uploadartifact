@@ -64,7 +64,7 @@ jobs:
 
   deploy_preprod:
     name: Deploy to Pre-Prod
-    needs: [deploy_situat, deploy_sit2] # Depends on both SIT environments
+    needs: [deploy_sit2] # Depends on both SIT environments
     runs-on: ubuntu-latest
     environment:
       name: preprod  
