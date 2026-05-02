@@ -1,0 +1,36 @@
+name: Upload GHA Logs to S3
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run build and capture logs
+        run: |
+          mkdir -p logs
+          echo "Build started..." | tee logs/build.log
+          npm install 2>&1 | tee -a logs/build.log
+          npm run build 2>&1 | tee -a logs/build.log
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::000209101359:role/gha-s3-upload-role
+          aws-region: ap-south-1
+
+      - name: Upload logs to S3
+        if: always()
+        run: |
+          aws s3 cp logs/build.log \
+          s3://my-gha-logs-bucket/${{ github.repository }}
