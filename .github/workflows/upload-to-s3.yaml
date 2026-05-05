@@ -1,5 +1,4 @@
 name: Upload GHA Logs to S3
-
 on:
   push:
     branches: [main]
