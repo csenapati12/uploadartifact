@@ -35,4 +35,4 @@ jobs:
         if: always()
         run: |
           aws s3 cp logs/build.log \
-          s3://github-s3-splunk/${{ github.repository }}//logs/${{ github.run_id }}.log
+          s3://github-s3-splunk/${{ github.repository }}/logs/${{ github.run_id }}.log
