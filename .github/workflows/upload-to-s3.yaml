@@ -19,10 +19,10 @@ jobs:
       - name: Run build and capture logs
         run: |
           mkdir -p logs
-          echo "Build started..." | tee logs/build.log
-          echo "Build chaitanhya..." | tee logs/build.log
-          npm install 2>&1 | tee -a logs/build.log
-          npm run build 2>&1 | tee -a logs/build.log
+          echo "Build started..." | tee logs/build-${{ github.run_id }}.log
+          echo "Build chaitanhya..." | tee logs/build-${{ github.run_id }}.log
+          npm install 2>&1 | tee -a logs/build-${{ github.run_id }}.log
+          npm run build 2>&1 | tee -a logs/build-${{ github.run_id }}.log
           
 
       - name: Configure AWS Credentials
@@ -34,5 +34,5 @@ jobs:
       - name: Upload logs to S3
         if: always()
         run: |
-          aws s3 cp logs/build.log \
+          aws s3 cp logs/build-${{ github.run_id }}.log \
           s3://github-s3-splunk/${{ github.repository }}/logs/${{ github.run_id }}.log
